@@ -5,11 +5,13 @@ function App() {
     const [array1, setArray1] = useState('');
     const [array2, setArray2] = useState('');
     const [similarity, setSimilarity] = useState(null);
+    const [scoringMatrix, setScoringMatrix] = useState([]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const result = await compareDna(array1.split(','), array2.split(','));
         setSimilarity(result.similarity);
+        setScoringMatrix(result.scoring_matrix);
     };
 
     return (
@@ -24,5 +26,28 @@ function App() {
         </div>
     );
 }
+
+const MatrixDisplay = ({ matrix }) => {
+    return (
+        <table>
+            <thead>
+                <tr>
+                    {matrix[0].map((header, index) => (
+                        <th key={index}>{header}</th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {matrix.slice(1).map((row, rowIndex) => (
+                    <tr key={rowIndex}>
+                        {row.map((cell, colIndex) => (
+                            <td key={colIndex}>{cell}</td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+};
 
 export default App;

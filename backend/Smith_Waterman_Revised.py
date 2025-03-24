@@ -93,7 +93,7 @@ def smith_waterman(seq1, seq2):
             aligned_seq2 += seq2[max_j - 1]
             max_j -= 1
     
-    return aligned_seq1[::-1], aligned_seq2[::-1]
+    return aligned_seq1[::-1], aligned_seq2[::-1], max_score, matrix
 
 # Function to calculate percentage similarity between two aligned sequences
 def calculate_similarity(aligned_seq1, aligned_seq2):

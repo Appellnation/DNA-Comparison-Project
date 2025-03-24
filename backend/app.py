@@ -29,7 +29,7 @@ def analyze():
 
     try:
         #Call DNA analysis function
-        aligned_seq1, aligned_seq2, similarity_score = smith_waterman(seq1, seq2)
+        aligned_seq1, aligned_seq2, similarity_score, scoring_matrix = smith_waterman(seq1, seq2)
 
         #Calculate the percentage similarity
         similarity = calculate_similarity(aligned_seq1, aligned_seq2)
@@ -41,7 +41,8 @@ def analyze():
         'aligned_sequence_1': aligned_seq1,
         'aligned_sequence_2': aligned_seq2,
         'similarity_score': similarity_score,
-        'similarity': similarity
+        'similarity': similarity,
+        'scoring_matrix': scoring_matrix.tolist()                #converting numpy array to list for JSON
     })
 
 if __name__ == '__main__':
