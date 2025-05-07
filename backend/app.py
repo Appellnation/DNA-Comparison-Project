@@ -28,9 +28,10 @@ def analyze():
         return jsonify({'error': 'Please provide two valid nucleotide sequences - One or both sequences are not valid.'}), 400
     
     #Confirm sequences are all given, or have been converted to DNA
-    if "U" in seq1 or "U" in seq2:
-        seq1 = ensure_dna_sequence(seq1)
-        seq2 = ensure_dna_sequence(seq2)
+    if 'U' in seq1:
+        seq1 = rna_to_dna(seq1)
+    if 'U' in seq2:
+        seq2 = rna_to_dna(seq2)
 
     try:
         #Call DNA analysis function
