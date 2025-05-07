@@ -21,7 +21,7 @@ def get_user_input():
     return seq1, seq2
 
 #Function to confirm sequences are DNA
-def confirm_sequences_are_DNA(seq1, seq2):
+def confirm_sequences_are_nucleotides(seq1, seq2):
     valid_nucleotides = {'A', 'T', 'G', 'C', 'U'}
     for seq in seq1 or seq2:
         if not all(nucleotide in valid_nucleotides for nucleotide in seq):

@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from backend.Smith_Waterman_Revised import (
-    confirm_sequences_are_DNA, 
+    get_user_input,
+    confirm_sequences_are_nucleotides,
+    rna_to_dna,
     ensure_dna_sequence, 
     smith_waterman, 
     calculate_similarity
@@ -19,7 +21,7 @@ def analyze():
         return jsonify({'error': 'Both sequences must be provided'}), 400
     
     #Confirm sequences are viable nucleotides only
-    if not confirm_sequences_are_DNA([seq1, seq2]):
+    if not confirm_sequences_are_nucleotides([seq1, seq2]):
         return jsonify({'error': 'Please provide two valid nucleotide sequences - One or both sequences are not valid.'}), 400
     
     #Confirm sequences are all given, or have been converted to DNA
