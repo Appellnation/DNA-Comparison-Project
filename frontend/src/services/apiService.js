@@ -1,41 +1,29 @@
-// src/services/apiService.js
+const API_URL = 'http://localhost:5000'; //Local API URL
 
-const API_URL = 'https://api.example.com'; // Replace with your API URL
-
-// Function to fetch data
-export const fetchData = async () => {
-  try {
-    const response = await fetch(`${API_URL}/data`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error; // Rethrow the error for further handling
-  }
-};
-
-// Function to post data
-export const postData = async (data) => {
-  try {
-    const response = await fetch(`${API_URL}/data`, {
+export const compareDna = async (sequence1, sequence2) =>{
+  try{
+    const response = await fetch(`${API_URL}/analyze`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        sequence1,
+        sequence2,
+      }),
     });
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error('Error posting data:', error);
+    console.error('Error comparing DNA sequences:', error);
     throw error; // Rethrow the error for further handling
   }
 };
 
 // Add more functions as needed for other API endpoints
+

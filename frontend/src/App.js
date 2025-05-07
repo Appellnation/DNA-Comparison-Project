@@ -2,24 +2,28 @@ import React, { useState } from 'react';
 import { compareDna } from './services/api'; // Import your API service
 
 function App() {
-    const [array1, setArray1] = useState('');
-    const [array2, setArray2] = useState('');
+    const [seq1, setSequence1] = useState('');
+    const [seq2, setSequence2] = useState('');
     const [similarity, setSimilarity] = useState(null);
     const [scoringMatrix, setScoringMatrix] = useState([]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const result = await compareDna(array1.split(','), array2.split(','));
-        setSimilarity(result.similarity);
-        setScoringMatrix(result.scoring_matrix);
+        try {
+            const result = await compareDna(sequence1, sequence2);
+            setSimilarity(result.similarity);
+            setScoringMatrix(result.scoring_matrix); // Adjust this if your backend returns a different structure
+        } catch (error) {
+            console.error("Error comparing DNA sequences:", error);
+        }
     };
 
     return (
         <div>
             <h1>DNA Analysis</h1>
             <form onSubmit={handleSubmit}>
-                <input type="text" value={array1} onChange={(e) => setArray1(e.target.value)} placeholder="Enter first array" />
-                <input type="text" value={array2} onChange={(e) => setArray2(e.target.value)} placeholder="Enter second array" />
+                <input type="text" value={seq1} onChange={(e) => setSequence1(e.target.value)} placeholder="Enter first array" />
+                <input type="text" value={seq2} onChange={(e) => setSequence2(e.target.value)} placeholder="Enter second array" />
                 <button type="submit">Compare</button>
             </form>
             {similarity !== null && <p>Similarity: {similarity}%</p>}
