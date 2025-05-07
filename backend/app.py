@@ -7,8 +7,11 @@ from backend.Smith_Waterman_Revised import (
     smith_waterman, 
     calculate_similarity
 )
+import logging
 
 app = Flask(__name__)
+
+logging.basicConfig(level=logging.INFO)
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
