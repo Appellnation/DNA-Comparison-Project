@@ -1,5 +1,7 @@
 from enum import IntEnum
 import numpy as np
+from Bio.Blast import NCBIWWW
+from Bio.Blast import NCBIXML
 
 # Constants for the scores
 class Score(IntEnum):
@@ -95,6 +97,8 @@ def smith_waterman(seq1, seq2):
     
     return aligned_seq1[::-1], aligned_seq2[::-1], max_score, matrix
 
+# I should probs implement a visualization of the matrix so the user can see whats going on
+
 # Function to calculate percentage similarity between two aligned sequences
 def calculate_similarity(aligned_seq1, aligned_seq2):
     if len(aligned_seq1) != len(aligned_seq2):
@@ -125,6 +129,22 @@ def calculate_similarity(aligned_seq1, aligned_seq2):
     similarity = (matches / total) * 100
     return similarity
 
+###Sending our sequence to BLAST 
+###Parsing Taxanomy
+def get_taxonomy_from_blast(query_sequence):
+    #perform blast search - blastn is blast nucleotide sequences, nt is nucleotide database
+    result_handle = NCBIWWW.qblast("blastn", "nt", query_sequence)
+
+    blast_records = NCBIXML.parse(result_handle)
+    for blast_record in blast_records:
+        for alignment in blast_record.alignments:
+            #return the best match/top of the list
+            for hsp in alignment.hsps:
+                #hsp - high scoring pair - best local alignment
+                print(f"subject: {alignment.title}")
+                print(f"Taxonomy: {alignment.hit_id}") #hit_id - the info we're looking for
+                return alignment.title, alignment.hit_id
+    return None, None #Case where zero matches are found
 
 if __name__ == "__main__":
     # Get user input for the two DNA sequences
@@ -147,3 +167,11 @@ if __name__ == "__main__":
         similarity = calculate_similarity(output_1, output_2)
         if similarity is not None:
             print(f"Percentage Similarity: {similarity:.2f}%")
+
+        #Blast search
+        match_title, taxanomy_info = get_taxonomy_from_blast(output_1)
+        if match_title and taxanomy_info:
+            print(f"Best match: {match_title}")
+            print(f"Taxonomy: {taxanomy_info}")
+        else:
+            print("No taxonomic information has been found.")
