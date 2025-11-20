@@ -1,8 +1,7 @@
 from enum import IntEnum
 import numpy as np
 import itertools
-from Bio.Blast import NCBIWWW
-from Bio.Blast import NCBIXML
+from Bio.Blast import NCBIWWW, NCBIXML
 
 # Constants for the scores
 class Score(IntEnum):

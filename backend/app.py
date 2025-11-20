@@ -1,12 +1,18 @@
 from flask import Flask, request, jsonify
+import itertools
+import numpy as np
+from Bio.Blast import NCBIWWW, NCBIXML
+
 from backend.Smith_Waterman_Revised import (
     get_user_input,
     confirm_sequences_are_nucleotides,
     rna_to_dna,
     ensure_dna_sequence, 
     smith_waterman, 
-    calculate_similarity
+    calculate_similarity,
+    get_taxonomy_from_blast
 )
+
 import logging
 
 app = Flask(__name__)
