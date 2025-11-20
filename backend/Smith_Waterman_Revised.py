@@ -1,5 +1,6 @@
 from enum import IntEnum
 import numpy as np
+import itertools
 from Bio.Blast import NCBIWWW
 from Bio.Blast import NCBIXML
 
@@ -24,11 +25,12 @@ def get_user_input():
 
 #Function to confirm sequences are DNA
 def confirm_sequences_are_nucleotides(seq1, seq2):
-    valid_nucleotides = {'A', 'T', 'G', 'C', 'U'}
-    for seq in seq1 or seq2:
-        if not all(nucleotide in valid_nucleotides for nucleotide in seq):
-            return False
-    return True
+    valid = {'A', 'T', 'G', 'C', 'U'}
+    combined = itertools.chain(seq1, seq2)
+    if not all (nucleotide in valid for nucleotide in combined):
+        print("Only valid nucleotide sequences are accepted.")
+    return seq1, seq2
+    
 
 # Function to convert potential RNA sequences to DNA for uniform analyzing
 def rna_to_dna(seq1, seq2):
