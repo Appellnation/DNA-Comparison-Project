@@ -1,2 +1,6 @@
-Flask
-
+enum
+flask
+numpy
+itertools
+biopython
+Bio.Blast
