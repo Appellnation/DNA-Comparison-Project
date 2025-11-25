@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 from Bio.Blast import NCBIWWW, NCBIXML
 
-from backend.Smith_Waterman_Revised import (
+from .Smith_Waterman_Revised import (
     get_user_input,
     confirm_sequences_are_nucleotides,
     rna_to_dna,

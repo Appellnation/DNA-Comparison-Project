@@ -10,8 +10,9 @@ function App() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const result = await compareDna(sequence1, sequence2);
-            setSimilarity(result.similarity);
+            // Pass seq1 and seq2 correctly to the API
+            const result = await compareDna(seq1, seq2);
+            setSimilarity(result.similarity_score);
             setScoringMatrix(result.scoring_matrix); // Adjust this if your backend returns a different structure
         } catch (error) {
             console.error("Error comparing DNA sequences:", error);
@@ -22,36 +23,60 @@ function App() {
         <div>
             <h1>DNA Analysis</h1>
             <form onSubmit={handleSubmit}>
-                <input type="text" value={seq1} onChange={(e) => setSequence1(e.target.value)} placeholder="Enter first array" />
-                <input type="text" value={seq2} onChange={(e) => setSequence2(e.target.value)} placeholder="Enter second array" />
+                <input 
+                    type="text" 
+                    value={seq1} 
+                    onChange={(e) => setSequence1(e.target.value)} 
+                    placeholder="Enter first sequence" 
+                />
+                <input
+                    type="text" 
+                    value={seq2} 
+                    onChange={(e) => setSequence2(e.target.value)} 
+                    placeholder="Enter second sequence" 
+                />
                 <button type="submit">Compare</button>
             </form>
-            {similarity !== null && <p>Similarity: {similarity}%</p>}
+
+            {similarity !== null && (
+                <div>
+                    <p>Similarity: {similarity}%</p>
+                    {scoringMatrix.length > 0 && <MatrixDisplay matrix={scoringMatrix} seq1={seq1} seq2={seq2} />}
+                </div>
+            )}  
         </div>
     );
 }
 
+// Displaying the matrix
 const MatrixDisplay = ({ matrix }) => {
     return (
-        <table>
-            <thead>
-                <tr>
-                    {matrix[0].map((header, index) => (
-                        <th key={index}>{header}</th>
-                    ))}
-                </tr>
-            </thead>
-            <tbody>
-                {matrix.slice(1).map((row, rowIndex) => (
-                    <tr key={rowIndex}>
-                        {row.map((cell, colIndex) => (
-                            <td key={colIndex}>{cell}</td>
+        <div>
+            <h3>Score Matrix</h3>
+            <table border="1">
+                <thead>
+                    <tr>
+                        {/* Render column headers (first row of the matrix) */}
+                        <th></th>
+                        {seq2.split('').map((char, index) => (
+                            <th key={index}>{char}</th>
                         ))}
                     </tr>
-                ))}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {/* Render the rest of the matrix rows */}
+                    {matrix.map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                            <td>{rowIndex}</td> {/* Render row index */}
+                            {row.map((cell, colIndex) => (
+                                <td key={colIndex}>{cell}</td>  /* Render each cell */
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
     );
-};
+}
 
 export default App;
