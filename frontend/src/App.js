@@ -7,6 +7,12 @@ function App() {
     const [similarity, setSimilarity] = useState(null);
     const [scoringMatrix, setScoringMatrix] = useState([]);
 
+    const getCellStyle = (value) => {
+        if (value > 0) return { backgroundColor:"#00fe08"}
+        if (value < 0) return { backgroundColor: "#ff0019"}
+        return {backgroundColor: "#399de4"}
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -22,17 +28,18 @@ function App() {
     return (
         <div>
             <h1>DNA Analysis</h1>
+
             <form onSubmit={handleSubmit}>
                 <input 
                     type="text" 
                     value={seq1} 
-                    onChange={(e) => setSequence1(e.target.value)} 
+                    onChange={(e) => setSequence1(e.target.value.toUpperCase())} 
                     placeholder="Enter first sequence" 
                 />
                 <input
                     type="text" 
                     value={seq2} 
-                    onChange={(e) => setSequence2(e.target.value)} 
+                    onChange={(e) => setSequence2(e.target.value.toUpperCase())} 
                     placeholder="Enter second sequence" 
                 />
                 <button type="submit">Compare</button>
@@ -56,6 +63,7 @@ const MatrixDisplay = ({ matrix }) => {
             <table border="1">
                 <thead>
                     <tr>
+                        <th></th>
                         {/* Render column headers (first row of the matrix) */}
                         <th></th>
                         {seq2.split('').map((char, index) => (
@@ -63,13 +71,23 @@ const MatrixDisplay = ({ matrix }) => {
                         ))}
                     </tr>
                 </thead>
+
                 <tbody>
                     {/* Render the rest of the matrix rows */}
                     {matrix.map((row, rowIndex) => (
                         <tr key={rowIndex}>
-                            <td>{rowIndex}</td> {/* Render row index */}
+                            {/* Labeling the Rows*/}
+                            <th>
+                                {rowIndex === 0 ? '-' : seq1[rowIndex - 1]}
+                            </th>
+                            {/* Matrix Cells*/}
                             {row.map((cell, colIndex) => (
-                                <td key={colIndex}>{cell}</td>  /* Render each cell */
+                                <td 
+                                    key={colIndex}
+                                    style={getsCellStyle(cell)}
+                                >
+                                    {cell}
+                                </td>     /* Render each cell */
                             ))}
                         </tr>
                     ))}

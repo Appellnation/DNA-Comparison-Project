@@ -32,73 +32,136 @@ def confirm_sequences_are_nucleotides(seq1, seq2):
     
 
 # Function to convert potential RNA sequences to DNA for uniform analyzing
-def rna_to_dna(seq1, seq2):
-    return seq1.replace("U", "T") and seq2.replace("U", "T")
+def rna_to_dna(seq):
+    return seq.replace("U","T")
 
 #Function to ensure that the sequence is DNA (and convert RNA to DNA if needed)
 def ensure_dna_sequence(sequence):
-    if 'U' in sequence.upper():
-        return rna_to_dna(sequence)
-    return sequence
+    return rna_to_dna(sequence.upper())
 
 
 
 # Implementing Smith-Waterman algorithm for local sequence alignment
 def smith_waterman(seq1, seq2):
-    row = len(seq1) + 1
-    col = len(seq2) + 1
-    matrix = np.zeros((row, col), dtype=np.int32)
-    tracing_matrix = np.zeros((row, col), dtype=np.int32)
+    rows = len(seq1) + 1
+    cols = len(seq2) + 1
+    matrix = [[None for _ in range(cols)] for _ in range(rows)]
+
+    max_score = 0
+    max_pos = (0, 0)
     
-    max_score = -1
-    max_index = (-1, -1)
-    
+    #Initialization step
+    for i in range(rows):
+        for j in range(cols):
+            matrix[i][j] = {
+                "score":0,
+                "dirs":[],
+                "match":False
+            }
+
     # Fill in the matrix with scores and traceback directions
-    for i in range(1, row):
-        for j in range(1, col):
-            match_value = Score.MATCH if seq1[i - 1] == seq2[j - 1] else Score.MISMATCH
-            diagonal_score = matrix[i - 1, j - 1] + match_value
-            vertical_score = matrix[i - 1, j] + Score.GAP
-            horizontal_score = matrix[i, j - 1] + Score.GAP
+    for i in range(1, rows):
+        for j in range(1, cols):
+            is_match = seq1[i - 1] == seq2[j - 1]
+
+            diag = matrix[i - 1][j - 1]["score"] + (
+                Score.MATCH if is_match else Score.MISMATCH
+            )
+            up = matrix[i - 1][j]["score"] + Score.GAP
+            left = matrix[i][j - 1]["score"] + Score.GAP
+
+            score = max(0, diag, up, left)
+            dirs = []
             
-            matrix[i, j] = max(0, diagonal_score, vertical_score, horizontal_score)
-            
-            if matrix[i, j] == 0:
-                tracing_matrix[i, j] = Trace.STOP
-            elif matrix[i, j] == horizontal_score:
-                tracing_matrix[i, j] = Trace.LEFT
-            elif matrix[i, j] == vertical_score:
-                tracing_matrix[i, j] = Trace.UP
-            elif matrix[i, j] == diagonal_score:
-                tracing_matrix[i, j] = Trace.DIAGONAL
+            if score == diag and score != 0:
+                dirs.append("diag")
+            if score == up and score != 0:
+                dirs.append("up")
+            if score == left and score != 0:
+                dirs.append("left")
                 
-            if matrix[i, j] > max_score:
-                max_index = (i, j)
-                max_score = matrix[i, j]
+            matrix[i][j] = {
+                "score": score,
+                "dirs": dirs,
+                "match": is_match if "diag" in dirs else False
+            }    
+
+            if score > max_score:
+                max_score = score
+                max_pos = (i, j)
+
+            #Traceback path storage    
     
     # Traceback to get the aligned sequences
-    aligned_seq1 = ""
-    aligned_seq2 = ""
-    max_i, max_j = max_index
-    
-    while tracing_matrix[max_i, max_j] != Trace.STOP:
-        if tracing_matrix[max_i, max_j] == Trace.DIAGONAL:
-            aligned_seq1 += seq1[max_i - 1]
-            aligned_seq2 += seq2[max_j - 1]
-            max_i -= 1
-            max_j -= 1
-        elif tracing_matrix[max_i, max_j] == Trace.UP:
-            aligned_seq1 += seq1[max_i - 1]
-            aligned_seq2 += '-'
-            max_i -= 1
-        elif tracing_matrix[max_i, max_j] == Trace.LEFT:
-            aligned_seq1 += '-'
-            aligned_seq2 += seq2[max_j - 1]
-            max_j -= 1
-    
-    return aligned_seq1[::-1], aligned_seq2[::-1], max_score, matrix
+    traceback_path = []
+    aligned_seq1 = []
+    aligned_seq2 = []
 
-# I should probs implement a visualization of the matrix so the user can see whats going on
+    i, j = max_pos
+    while matrix[i][j]["score"] > 0:
+        traceback_path.append([i, j])
+
+        if "diag" in matrix[i][j]["dirs"]:
+            aligned_seq1.append(seq1[i - 1])
+            aligned_seq2.append(seq2[j - 1])
+            i -= 1
+            j -= 1
+        elif "up" in matrix[i][j]["dirs"]:
+            aligned_seq1.append(seq1[i - 1])
+            aligned_seq2.append("-")
+            i -= 1
+        elif "left" in matrix[i][j]["dirs"]:
+            aligned_seq1.append("-")
+            aligned_seq2.append(seq2[j - 1])
+            j -= 1
+
+    return {
+        "matrix": matrix,
+        "traceback": traceback_path,
+        "aligned_seq1": "".join(reversed(aligned_seq1)),
+        "aligned_seq2": "".join(reversed(aligned_seq2)),
+        "max_score": max_score
+    }
+
+#Function to make the alignment for the smith-waterman
+def display_alignment_matrix(matrix, seq1, seq2, traceback_path=None):
+    
+    arrow_map = {"diag": "↖", "up": "↑", "left": "←"}
+
+    # Print top header row (seq2 letters)
+    print("     ", end="")
+    for c in seq2:
+        print(f"  {c}  ", end="")
+    print()
+
+    for i, row in enumerate(matrix):
+        # Row header (seq1 letter or '-')
+        row_char = '-' if i == 0 else seq1[i-1]
+        print(f" {row_char} ", end="")
+
+        for j, cell in enumerate(row):
+            score = cell["score"]
+            dirs = cell["dirs"]
+
+            # Combine arrows
+            arrow = "".join(arrow_map[d] for d in dirs) if dirs else " "
+        
+            # Determine color
+            if traceback_path and [i, j] in traceback_path:
+                color = "\033[93m"  # Yellow for traceback
+            elif cell.get("match", False):
+                color = "\033[92m"  # Green for match
+            elif "diag" in dirs:
+                color = "\033[91m"  # Red for mismatch
+            elif "up" in dirs or "left" in dirs:
+                color = "\033[94m"  # Blue for gaps
+            else:
+                color = "\033[0m"   # Default
+
+            print(f"{color}{score:2}{arrow}\033[0m ", end="")
+
+        print()  # new line for next row
+
 
 # Function to calculate percentage similarity between two aligned sequences
 def calculate_similarity(aligned_seq1, aligned_seq2):
@@ -149,16 +212,17 @@ def get_taxonomy_from_blast(query_sequence):
 
 if __name__ == "__main__":
     # Get user input for the two DNA sequences
-    seq1, seq2 = get_user_input()
+    seq1, seq2 = get_user_input
+    seq1 = ensure_dna_sequence(seq1).upper()
+    seq2 = ensure_dna_sequence(seq2).upper()
     
     if not seq1 or not seq2:
         print("Error: Both sequences must be provided.")
     else:
-        # Encure both sequences are DNA (convert RNA to DNA if needed)
-        seq1 = ensure_dna_sequence(seq1)
-        seq2 = ensure_dna_sequence(seq2)
         # Executing the Smith-Waterman local alignment algorithm
-        output_1, output_2 = smith_waterman(seq1, seq2)
+        result = smith_waterman(seq1, seq2)
+        output_1 = result["aligned_seq1"]
+        output_2 = result["aligned_seq2"]
 
         # Displaying the aligned sequences
         print(f"Aligned Sequence 1: {output_1}")
@@ -170,7 +234,8 @@ if __name__ == "__main__":
             print(f"Percentage Similarity: {similarity:.2f}%")
 
         #Blast search
-        match_title, taxanomy_info = get_taxonomy_from_blast(output_1)
+        query_sequence = output_1.replace("-", "")
+        match_title, taxanomy_info = get_taxonomy_from_blast(query_sequence)
         if match_title and taxanomy_info:
             print(f"Best match: {match_title}")
             print(f"Taxonomy: {taxanomy_info}")
