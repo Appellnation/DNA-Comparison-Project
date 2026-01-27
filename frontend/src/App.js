@@ -4,8 +4,10 @@ import { compareDna } from './services/api'; // Import your API service
 function App() {
     const [seq1, setSequence1] = useState('');
     const [seq2, setSequence2] = useState('');
+    const [traceback, setTraceback] = useState([]);
     const [similarity, setSimilarity] = useState(null);
     const [scoringMatrix, setScoringMatrix] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const getCellStyle = (value) => {
         if (value > 0) return { backgroundColor:"#00fe08"}
@@ -13,15 +15,34 @@ function App() {
         return {backgroundColor: "#399de4"}
     }
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!seq1 || !seq2) {
+        alert("Both sequences are required");
+        return;
+    }
+
         try {
             // Pass seq1 and seq2 correctly to the API
+            setLoading(true);
             const result = await compareDna(seq1, seq2);
+
+            if (!Array.isArray(result.scoring_matrix)){
+                throw new Error("There is an invalid scoring matrix");
+            }
+
             setSimilarity(result.similarity_score);
             setScoringMatrix(result.scoring_matrix); // Adjust this if your backend returns a different structure
+            setTraceback(result.traceback);
+            
+            setLoading(false);
+
         } catch (error) {
             console.error("Error comparing DNA sequences:", error);
+        }finally {
+            setLoading(false);
         }
     };
 
@@ -42,13 +63,23 @@ function App() {
                     onChange={(e) => setSequence2(e.target.value.toUpperCase())} 
                     placeholder="Enter second sequence" 
                 />
-                <button type="submit">Compare</button>
+                <button type="submit" disabled={loading}>
+                    {loading? "Comparing ..." : "Compare"}
+                </button>
             </form>
 
             {similarity !== null && (
                 <div>
                     <p>Similarity: {similarity}%</p>
-                    {scoringMatrix.length > 0 && <MatrixDisplay matrix={scoringMatrix} seq1={seq1} seq2={seq2} />}
+                    {scoringMatrix.length > 0 && (
+                        <MatrixDisplay
+                            matrix={scoringMatrix}
+                            seq1={seq1}
+                            seq2={seq2}
+                            traceback={traceback}
+                            getCellStyle={getCellStyle}
+                        />
+)}
                 </div>
             )}  
         </div>
@@ -56,7 +87,7 @@ function App() {
 }
 
 // Displaying the matrix
-const MatrixDisplay = ({ matrix }) => {
+const MatrixDisplay = ({ matrix, seq1, seq2, traceback, getCellStyle }) => {
     return (
         <div>
             <h3>Score Matrix</h3>
@@ -65,7 +96,6 @@ const MatrixDisplay = ({ matrix }) => {
                     <tr>
                         <th></th>
                         {/* Render column headers (first row of the matrix) */}
-                        <th></th>
                         {seq2.split('').map((char, index) => (
                             <th key={index}>{char}</th>
                         ))}
@@ -81,20 +111,33 @@ const MatrixDisplay = ({ matrix }) => {
                                 {rowIndex === 0 ? '-' : seq1[rowIndex - 1]}
                             </th>
                             {/* Matrix Cells*/}
-                            {row.map((cell, colIndex) => (
-                                <td 
-                                    key={colIndex}
-                                    style={getsCellStyle(cell)}
-                                >
-                                    {cell}
-                                </td>     /* Render each cell */
-                            ))}
+
+                            {row.map((cell, colIndex) => {
+                                const isTraceback = traceback?.some(
+                                    ([i, j]) => i === rowIndex && j === colIndex
+                                );
+                                const baseStyle = getCellStyle(cell.score);
+
+                                return (
+                                    <td
+                                        key={colIndex}
+                                        style={{
+                                            ...baseStyle,
+                                            backgroundColor: isTraceback
+                                                ? "yellow"
+                                                : baseStyle.backgroundColor
+                                        }}
+                                    >
+                                        {cell.score}
+                                    </td>
+                                );
+                            })}
                         </tr>
                     ))}
                 </tbody>
             </table>
         </div>
     );
-}
+};
 
 export default App;
