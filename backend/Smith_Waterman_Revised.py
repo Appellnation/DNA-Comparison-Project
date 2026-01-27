@@ -27,8 +27,7 @@ def confirm_sequences_are_nucleotides(seq1, seq2):
     valid = {'A', 'T', 'G', 'C', 'U'}
     combined = itertools.chain(seq1, seq2)
     if not all (nucleotide in valid for nucleotide in combined):
-        print("Only valid nucleotide sequences are accepted.")
-    return seq1, seq2
+        raise ValueError("Only valid nucleotide sequences are accepted.")
     
 
 # Function to convert potential RNA sequences to DNA for uniform analyzing
@@ -212,7 +211,7 @@ def get_taxonomy_from_blast(query_sequence):
 
 if __name__ == "__main__":
     # Get user input for the two DNA sequences
-    seq1, seq2 = get_user_input
+    seq1, seq2 = get_user_input()
     seq1 = ensure_dna_sequence(seq1).upper()
     seq2 = ensure_dna_sequence(seq2).upper()
     
