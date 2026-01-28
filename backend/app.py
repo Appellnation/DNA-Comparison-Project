@@ -6,7 +6,8 @@ from .Smith_Waterman_Revised import (
     confirm_sequences_are_nucleotides,
     rna_to_dna,
     smith_waterman, 
-    calculate_similarity
+    calculate_similarity,
+    get_taxonomy_from_blast,
 )
 
 import logging
@@ -18,12 +19,16 @@ logging.basicConfig(level=logging.INFO)
 
 @app.route('/compare', methods=['POST'])
 def compare():
-    run_blast = False
-    data = request.json
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error' : "Invalid JSON payload"}), 400
+
+    run_blast = data.get("run_blast", False)
+    
     seq1 = data.get('seq1')
     seq2 = data.get('seq2')
-    seq1 = rna_to_dna(seq1)
-    seq2 = rna_to_dna(seq2)
+
 
     #Confirm two sequences are given
     if not seq1 or not seq2:
@@ -42,14 +47,27 @@ def compare():
     try:
         #Call DNA analysis function
         result = smith_waterman(seq1, seq2)
+
+        blast_result = None
+
+        if run_blast:
+            query_sequence = result["aligned_seq1"].replace("-", "")
+
+            if len(query_sequence) >= 20:
+                title, taxonomy = get_taxonomy_from_blast(query_sequence)
+                blast_result = {
+                    "title" : title,
+                    "taxonomy" : taxonomy
+                }
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
     return jsonify({
-        'similarity_score': similarity_score,
-        'scoring_matrix': result["matrix"]                #converting numpy array to list for JSON
-        'traceback': result["traceback"]
+        'similarity_score': result["similarity"],
+        'scoring_matrix': result["matrix"],                #converting numpy array to list for JSON
+        'traceback': result["traceback"],
+        'blast': blast_result
     })
 
 if __name__ == '__main__':

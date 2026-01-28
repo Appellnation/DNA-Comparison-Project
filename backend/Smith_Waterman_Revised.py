@@ -205,7 +205,13 @@ def calculate_similarity(aligned_seq1, aligned_seq2):
 ###Parsing Taxanomy
 def get_taxonomy_from_blast(query_sequence):
     #perform blast search - blastn is blast nucleotide sequences, nt is nucleotide database
-    result_handle = NCBIWWW.qblast("blastn", "nt", query_sequence)
+    result_handle = NCBIWWW.qblast(
+        program = "blastn",
+        database ="nt",
+        sequence = query_sequence,
+        hitlist_size = 1
+    )
+    
 
     blast_records = NCBIXML.parse(result_handle)
     for blast_record in blast_records:
@@ -241,12 +247,4 @@ if __name__ == "__main__":
         if similarity is not None:
             print(f"Percentage Similarity: {similarity:.2f}%")
 
-        #Blast search
-        query_sequence = output_1.replace("-", "")
-        if run_blast:
-            match_title, taxanomy_info = get_taxonomy_from_blast(query_sequence)
-        if match_title and taxanomy_info:
-            print(f"Best match: {match_title}")
-            print(f"Taxonomy: {taxanomy_info}")
-        else:
-            print("No taxonomic information has been found.")
+        
