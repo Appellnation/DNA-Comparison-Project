@@ -1,29 +1,29 @@
 from flask import Flask, request, jsonify
-import itertools
-import numpy as np
+from flask_cors import CORS
 from Bio.Blast import NCBIWWW, NCBIXML
 
 from .Smith_Waterman_Revised import (
-    get_user_input,
     confirm_sequences_are_nucleotides,
     rna_to_dna,
-    ensure_dna_sequence, 
     smith_waterman, 
-    calculate_similarity,
-    get_taxonomy_from_blast
+    calculate_similarity
 )
 
 import logging
 
 app = Flask(__name__)
+CORS(app)
 
 logging.basicConfig(level=logging.INFO)
 
-@app.route('/analyze', methods=['POST'])
-def analyze():
+@app.route('/compare', methods=['POST'])
+def compare():
+    run_blast = False
     data = request.json
-    seq1 = data.get('sequence1')
-    seq2 = data.get('sequence2')
+    seq1 = data.get('seq1')
+    seq2 = data.get('seq2')
+    seq1 = rna_to_dna(seq1)
+    seq2 = rna_to_dna(seq2)
 
     #Confirm two sequences are given
     if not seq1 or not seq2:
@@ -41,20 +41,15 @@ def analyze():
 
     try:
         #Call DNA analysis function
-        aligned_seq1, aligned_seq2, similarity_score, scoring_matrix = smith_waterman(seq1, seq2)
-
-        #Calculate the percentage similarity
-        similarity = calculate_similarity(aligned_seq1, aligned_seq2)
+        result = smith_waterman(seq1, seq2)
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
     return jsonify({
-        'aligned_sequence_1': aligned_seq1,
-        'aligned_sequence_2': aligned_seq2,
         'similarity_score': similarity_score,
-        'similarity': similarity,
-        'scoring_matrix': scoring_matrix.tolist()                #converting numpy array to list for JSON
+        'scoring_matrix': result["matrix"]                #converting numpy array to list for JSON
+        'traceback': result["traceback"]
     })
 
 if __name__ == '__main__':
