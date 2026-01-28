@@ -83,6 +83,7 @@ def smith_waterman(seq1, seq2):
                 "score": score,
                 "dirs": dirs,
                 "match": is_match if "diag" in dirs else False
+                # match=True only when diagonal move AND characters equal
             }    
 
             if score > max_score:
@@ -98,6 +99,8 @@ def smith_waterman(seq1, seq2):
 
     i, j = max_pos
     while matrix[i][j]["score"] > 0:
+        if i == 0 and j == 0:
+            break
         traceback_path.append([i, j])
 
         if "diag" in matrix[i][j]["dirs"]:
@@ -164,6 +167,12 @@ def display_alignment_matrix(matrix, seq1, seq2, traceback_path=None):
 
 # Function to calculate percentage similarity between two aligned sequences
 def calculate_similarity(aligned_seq1, aligned_seq2):
+
+    """
+    Similarity = (matches / aligned length) * 100
+    Gaps are treated as mismatches.
+    """
+
     if len(aligned_seq1) != len(aligned_seq2):
         print("Error: Sequences must be of the same length to calculate similarity.")
         return None
@@ -234,7 +243,8 @@ if __name__ == "__main__":
 
         #Blast search
         query_sequence = output_1.replace("-", "")
-        match_title, taxanomy_info = get_taxonomy_from_blast(query_sequence)
+        if run_blast:
+            match_title, taxanomy_info = get_taxonomy_from_blast(query_sequence)
         if match_title and taxanomy_info:
             print(f"Best match: {match_title}")
             print(f"Taxonomy: {taxanomy_info}")

@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { compareDna } from './services/api'; // Import your API service
 
 function App() {
     const [seq1, setSequence1] = useState('');
     const [seq2, setSequence2] = useState('');
     const [traceback, setTraceback] = useState([]);
+    const [traceStep, setTraceStep] = useState(0);
     const [similarity, setSimilarity] = useState(null);
     const [scoringMatrix, setScoringMatrix] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [animationSpeed, setAnimationSpeed] = useState(300);
+
+
 
     const getCellStyle = (value) => {
         if (value > 0) return { backgroundColor:"#00fe08"}
@@ -23,7 +27,6 @@ function App() {
         alert("Both sequences are required");
         return;
     }
-
         try {
             // Pass seq1 and seq2 correctly to the API
             setLoading(true);
@@ -36,7 +39,6 @@ function App() {
             setSimilarity(result.similarity_score);
             setScoringMatrix(result.scoring_matrix); // Adjust this if your backend returns a different structure
             setTraceback(result.traceback);
-            
             setLoading(false);
 
         } catch (error) {
@@ -45,6 +47,18 @@ function App() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (traceback.length === 0) return;
+
+        const interval = setInterval(() => {
+            setTraceStep(prev =>
+                prev < traceback.length ? prev + 1 : prev
+            );
+        }, 300);
+
+        return () => clearInterval(interval);
+    }, [traceback]);
 
     return (
         <div>
@@ -76,7 +90,7 @@ function App() {
                             matrix={scoringMatrix}
                             seq1={seq1}
                             seq2={seq2}
-                            traceback={traceback}
+                            traceback={traceback.slice(0, traceStep)}
                             getCellStyle={getCellStyle}
                         />
 )}
