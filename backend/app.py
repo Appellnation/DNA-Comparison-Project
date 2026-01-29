@@ -47,6 +47,10 @@ def compare():
     try:
         #Call DNA analysis function
         result = smith_waterman(seq1, seq2)
+        similarity = calculate_similarity(
+            result["aligned_seq1"],
+            result["aligned_seq2="]
+        )
 
         blast_result = None
 
@@ -64,7 +68,7 @@ def compare():
         return jsonify({'error': str(e)}), 500
 
     return jsonify({
-        'similarity_score': result["similarity"],
+        'similarity_score': similarity,
         'scoring_matrix': result["matrix"],                #converting numpy array to list for JSON
         'traceback': result["traceback"],
         'blast': blast_result

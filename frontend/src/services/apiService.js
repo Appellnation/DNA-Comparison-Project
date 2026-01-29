@@ -1,29 +1,25 @@
 const API_URL = 'http://localhost:5000'; //Local API URL
 
-export const compareDna = async (sequence1, sequence2) =>{
-  try{
-    const response = await fetch(`${API_URL}/analyze`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sequence1,
-        sequence2,
-      }),
+export async function compareDna(seq1, seq2, runBlast = false) {
+    const response = await fetch('http://localhost:5000/compare', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            seq1,
+            seq2,
+            run_blast: runBlast
+        }),
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Server error');
     }
 
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error('Error comparing DNA sequences:', error);
-    throw error; // Rethrow the error for further handling
-  }
-};
+    return response.json();
+}
 
 // Add more functions as needed for other API endpoints
 

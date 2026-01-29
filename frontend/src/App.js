@@ -8,6 +8,9 @@ function App() {
     const [traceStep, setTraceStep] = useState(0);
     const [similarity, setSimilarity] = useState(null);
     const [scoringMatrix, setScoringMatrix] = useState([]);
+    const [runBlast, setRunBlast] = useState(false);
+    const [blastResult, setBlastResult] = useState(null);
+    const [blastLoading, setBlastLoading] = useState(false);
     const [loading, setLoading] = useState(false);
     const [animationSpeed, setAnimationSpeed] = useState(300);
 
@@ -30,7 +33,7 @@ function App() {
         try {
             // Pass seq1 and seq2 correctly to the API
             setLoading(true);
-            const result = await compareDna(seq1, seq2);
+            const result = await compareDna(seq1, seq2, runBlast);
 
             if (!Array.isArray(result.scoring_matrix)){
                 throw new Error("There is an invalid scoring matrix");
