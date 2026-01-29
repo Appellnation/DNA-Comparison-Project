@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { compareDna } from './services/api'; // Import your API service
+import { compareDna } from './services/api';
 
 function App() {
     const [seq1, setSequence1] = useState('');
