@@ -205,24 +205,34 @@ def calculate_similarity(aligned_seq1, aligned_seq2):
 ###Parsing Taxanomy
 def get_taxonomy_from_blast(query_sequence):
     #perform blast search - blastn is blast nucleotide sequences, nt is nucleotide database
-    result_handle = NCBIWWW.qblast(
-        program = "blastn",
-        database ="nt",
-        sequence = query_sequence,
-        hitlist_size = 1
-    )
     
+    try:
+        result_handle = NCBIWWW.qblast(
+            program = "blastn",
+            database ="nt",
+            sequence = query_sequence,
+            hitlist_size = 1
+        )
 
-    blast_records = NCBIXML.parse(result_handle)
-    for blast_record in blast_records:
-        for alignment in blast_record.alignments:
-            #return the best match/top of the list
-            for hsp in alignment.hsps:
-                #hsp - high scoring pair - best local alignment
-                print(f"subject: {alignment.title}")
-                print(f"Taxonomy: {alignment.hit_id}") #hit_id - the info we're looking for
-                return alignment.title, alignment.hit_id
-    return None, None #Case where zero matches are found
+        blast_record = NCBIXML.parse(result_handle)
+
+        if not blast_record.alingments:
+            return None, None
+        
+        top_alignment = blast_record.alignments[0]
+
+        title = top_alignment.title
+
+        #Extracting Organism Name from Reference Number(s)
+        taxonomy = (
+            title.split('[')[-1].replace(']', '')
+        if '[' in title else "Unknown organism"
+        )
+        
+        return title, taxonomy
+    
+    except Exception:
+        return None, None
 
 if __name__ == "__main__":
     # Get user input for the two DNA sequences

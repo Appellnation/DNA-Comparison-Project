@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from Bio.Blast import NCBIWWW, NCBIXML
+import io
 
 from .Smith_Waterman_Revised import (
     confirm_sequences_are_nucleotides,
@@ -47,10 +48,6 @@ def compare():
     try:
         #Call DNA analysis function
         result = smith_waterman(seq1, seq2)
-        similarity = calculate_similarity(
-            result["aligned_seq1"],
-            result["aligned_seq2="]
-        )
 
         blast_result = None
 
