@@ -234,6 +234,48 @@ def get_taxonomy_from_blast(query_sequence):
     except Exception:
         return None, None
 
+def get_top_blast_hits(query_sequence, max_hits = 3):
+    """
+    Run Blast on query sequence and return top 3 hits
+    Each hit includes 'title', 'accession', 'e-value', and 'taxonomy'
+    """
+    try: 
+        result_handle = NCBIWWW.qblast(
+            program = 'blastn',
+            database = 'nt',
+            sequence = query_sequence,
+            hitlist_size = max_hits
+        )
+        blast_records = NCBIXML.parse(result_handle)
+        hits = []
+
+        for blast_record in blast_records:
+            for i, alignment in enumerate(blast_record.alignments):
+                if i >= max_hits:
+                    break
+            
+                for hsp in alignment.hsps:
+                    title = alignment.title
+                    accession = alignment.accession
+                    e_value = hsp.expect
+
+                    taxonomy = title.split('[')[-1].replace(']', '') if '[' in title else "Unknown organism"
+
+                    hits.append({
+                        "title": title,
+                        "accession": accession,
+                        "e_value": e_value,
+                        "taxonomy": taxonomy
+                    })
+                    break
+            break
+
+        return hits
+
+    except Exception as e:
+        print(f"BLAST failed: {e}")
+        return
+
 if __name__ == "__main__":
     # Get user input for the two DNA sequences
     seq1, seq2 = get_user_input()

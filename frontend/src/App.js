@@ -17,10 +17,17 @@ function App() {
 
 
     const getCellStyle = (value) => {
-        if (value > 0) return { backgroundColor:"#00fe08"}
-        if (value < 0) return { backgroundColor: "#ff0019"}
-        return {backgroundColor: "#399de4"}
-    }
+        const maxScore = 5; // Adjust in future mayhaps
+        const intensity = Math.min(Math.abs(value) / maxScore, 1);
+
+        if (value > 0) {
+            return { backgroundColor: `rgba(0,255,0,${intensity})` };
+        }
+        if (value < 0) {
+            return { backgroundColor: `rgba(255,0,0,${intensity})` };
+        }
+        return { backgroundColor: "#399de4" };
+    };
 
 
     const handleSubmit = async (e) => {
@@ -31,6 +38,10 @@ function App() {
         return;
     }
         try {
+
+            setTraceStep(0);
+            setBlastResult(null);
+
             // Pass seq1 and seq2 correctly to the API
             setLoading(true);
             const result = await compareDna(seq1, seq2, runBlast);
@@ -42,7 +53,9 @@ function App() {
             setSimilarity(result.similarity_score);
             setScoringMatrix(result.scoring_matrix); // Adjust this if your backend returns a different structure
             setTraceback(result.traceback);
-            setLoading(false);
+            setBlastResult(result.blast);
+            setAlignedSeq1(result.aligned_seq1);
+            setAlignedSeq2(result.aligned_seq2);
 
         } catch (error) {
             console.error("Error comparing DNA sequences:", error);
@@ -58,15 +71,14 @@ function App() {
             setTraceStep(prev =>
                 prev < traceback.length ? prev + 1 : prev
             );
-        }, 300);
+        }, animationSpeed);
 
         return () => clearInterval(interval);
-    }, [traceback]);
+    }, [traceback, animationSpeed]);
 
     return (
         <div>
             <h1>DNA Analysis</h1>
-
             <form onSubmit={handleSubmit}>
                 <input 
                     type="text" 
@@ -80,32 +92,80 @@ function App() {
                     onChange={(e) => setSequence2(e.target.value.toUpperCase())} 
                     placeholder="Enter second sequence" 
                 />
+                <label style={{ display: "block", marginTop: "10px" }}>
+                    <input
+                        type="checkbox"
+                        checked={runBlast}
+                        onChange={(e) => setRunBlast(e.target.checked)}
+                    />
+                    Run BLAST taxonomic analysis
+                </label>    
                 <button type="submit" disabled={loading}>
                     {loading? "Comparing ..." : "Compare"}
                 </button>
             </form>
 
             {similarity !== null && (
-                <div>
-                    <p>Similarity: {similarity}%</p>
-                    {scoringMatrix.length > 0 && (
-                        <MatrixDisplay
-                            matrix={scoringMatrix}
-                            seq1={seq1}
-                            seq2={seq2}
-                            traceback={traceback.slice(0, traceStep)}
-                            getCellStyle={getCellStyle}
-                        />
-)}
-                </div>
-            )}  
+                <>
+                    <div>
+                        <p>Similarity: {similarity}%</p>
+
+                        <div style={{
+                            marginTop: "20px",
+                            padding: "10px",
+                            backgroundColor: "#222",
+                            color: "#00ff88",
+                            fontFamily: "monospace"
+                        }}>
+                            <h3>Optimal Local Alignment</h3>
+                            <div>{alignedSeq1}</div>
+                            <div>{alignedSeq2}</div>
+                        </div>
+
+                        {scoringMatrix.length > 0 && (
+                            <MatrixDisplay
+                                matrix={scoringMatrix}
+                                seq1={seq1}
+                                seq2={seq2}
+                                traceback={traceback.slice(0, traceStep)}
+                                getCellStyle={getCellStyle}
+                            />
+                        )}
+                    </div>
+
+                    {runBlast && (
+                        <div style={{
+                            marginTop: "20px",
+                            padding: "15px",
+                            border: "1px solid #ccc",
+                            borderRadius: "8px",
+                            backgroundColor: "#f4f4f4"
+                        }}>
+                            <h3>BLAST Taxonomic Result</h3>
+
+                            {blastResult ? (
+                                blastResult.title ? (
+                                    <>
+                                        <p><strong>Top Match:</strong> {blastResult.title}</p>
+                                        <p><strong>Organism:</strong> {blastResult.taxonomy}</p>
+                                    </>
+                                ) : (
+                                    <p>No significant BLAST match found.</p>
+                                )
+                            ) : (
+                                <p>BLAST not run or still loading.</p>
+                            )}
+                        </div>
+                    )}
+              </>
+            )}
         </div>
     );
 }
 
 // Displaying the matrix
 const MatrixDisplay = ({ matrix, seq1, seq2, traceback, getCellStyle }) => {
-    return (
+    return(
         <div>
             <h3>Score Matrix</h3>
             <table border="1">
