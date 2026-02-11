@@ -1,7 +1,7 @@
-DNA Local Alignment Web APplication
+DNA Local Alignment Web Application
 
 Overview
-This full-stack web application performs local DNA sequence alignment using the Smith-Waterman algorithm and optionally provides useres with NCBI BLAST taxonomic analyses.
+This full-stack web application performs local DNA sequence alignment using the Smith-Waterman algorithm and optionally provides users with NCBI BLAST taxonomic analyses.
 
 This demonstrates:
     - Algorithm implementation (dynamic programming)
@@ -32,3 +32,22 @@ Backend:
 
 Architecture
 User Input -> React UI
+React -> Post
+Flask Backend:
+    - Validate sequences
+    - Run Smith-Waterman
+    - Optionally run BLAST
+    - Return JSON response
+React: 
+    - Render alignment
+    - Animation of traceback
+    - Displays taxonomic result
+
+
+Why This Project
+My academic background is in biology, my senior thesis and research was heavily focused around viruses. This project bridges bioinformatics and software engineering by combining:
+    - Algorithmic implementation
+    - Backend API design
+    - Frontend Visualization
+    - External data integration
+Essentially, it demonstrates the ability to build complete systems from algorithm(s) to UI.
