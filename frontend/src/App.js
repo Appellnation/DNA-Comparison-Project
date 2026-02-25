@@ -42,10 +42,12 @@ function App() {
 
             setTraceStep(0);
             setBlastResult(null);
+            setBlastLoading(false);
             setError(null);
 
             // Pass seq1 and seq2 correctly to the API
             setLoading(true);
+            if (runBlast) setBlastLoading(true);
             const result = await compareDna(seq1, seq2, runBlast);
 
             if (!Array.isArray(result.scoring_matrix)){
@@ -56,12 +58,14 @@ function App() {
             setScoringMatrix(result.scoring_matrix); // Adjust this if your backend returns a different structure
             setTraceback(result.traceback);
             setBlastResult(result.blast);
+            setBlastLoading(false);
             setAlignedSeq1(result.aligned_seq1);
             setAlignedSeq2(result.aligned_seq2);
 
         } catch (error) {
             console.error("Error comparing DNA sequences:", error);
             setError(error.message);
+            setBlastLoading(false);
         }finally {
             setLoading(false);
         }
@@ -152,7 +156,9 @@ function App() {
                         }}>
                             <h3>BLAST Taxonomic Result</h3>
 
-                            {blastResult ? (
+                            {blastLoading ? (
+                                <p>Running BLAST analysis…</p>
+                            ) : blastResult ? (
                                 blastResult.title ? (
                                     <>
                                         <p><strong>Top Match:</strong> {blastResult.title}</p>
@@ -162,7 +168,7 @@ function App() {
                                     <p>No significant BLAST match found.</p>
                                 )
                             ) : (
-                                <p>BLAST not run or still loading.</p>
+                                <p>BLAST not run.</p>
                             )}
                         </div>
                     )}
