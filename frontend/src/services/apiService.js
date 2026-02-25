@@ -1,14 +1,18 @@
 const API_URL = 'http://localhost:5000';
 
-export async function compareDna(seq1, seq2, runBlast = false) {
+export const compareDna = async (seq1, seq2, runBlast) => {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); //20 seconds for timeout
+    const timeout = 15000; // 15 seconds
+
+    const timeoutId = setTimeout(() => {
+        controller.abort();
+    }, timeout);
 
     try {
-        const response = await fetch('http://localhost:5000/compare', {
-            method: 'POST',
+        const response = await fetch("http://localhost:5000/compare", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 seq1,
@@ -18,22 +22,19 @@ export async function compareDna(seq1, seq2, runBlast = false) {
             signal: controller.signal
         });
 
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || 'Server error');
+            throw new Error(errorData.error || "Request failed");
         }
 
         return await response.json();
 
     } catch (error) {
-        if (error.name === 'AbortError') {
-            throw new Error('Request timed out. Please try again.');
+        if (error.name === "AbortError") {
+            throw new Error("Request timed out. BLAST may be taking too long.");
         }
         throw error;
-
-    } finally {
-        // Always runs, even on error
-        clearTimeout(timeoutId);
     }
-}
-
+};

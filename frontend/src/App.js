@@ -13,6 +13,7 @@ function App() {
     const [blastLoading, setBlastLoading] = useState(false);
     const [loading, setLoading] = useState(false);
     const [animationSpeed, setAnimationSpeed] = useState(300);
+    const [error, setError] = useState(null);
 
 
 
@@ -41,6 +42,7 @@ function App() {
 
             setTraceStep(0);
             setBlastResult(null);
+            setError(null);
 
             // Pass seq1 and seq2 correctly to the API
             setLoading(true);
@@ -59,6 +61,7 @@ function App() {
 
         } catch (error) {
             console.error("Error comparing DNA sequences:", error);
+            setError(error.message);
         }finally {
             setLoading(false);
         }
@@ -79,6 +82,12 @@ function App() {
     return (
         <div>
             <h1>DNA Analysis</h1>
+
+            {error && (
+                <div style={{ color: "red", marginBottom: "10px" }}>
+                    {error}
+                </div>
+            )}
             <form onSubmit={handleSubmit}>
                 <input 
                     type="text" 
