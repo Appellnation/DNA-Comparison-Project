@@ -7,13 +7,14 @@ function App() {
     const [traceback, setTraceback] = useState([]);
     const [traceStep, setTraceStep] = useState(0);
     const [similarity, setSimilarity] = useState(null);
+    const [error, setError] = useState(null);
     const [scoringMatrix, setScoringMatrix] = useState([]);
     const [runBlast, setRunBlast] = useState(false);
     const [blastResult, setBlastResult] = useState(null);
     const [blastLoading, setBlastLoading] = useState(false);
     const [loading, setLoading] = useState(false);
     const [animationSpeed, setAnimationSpeed] = useState(300);
-    const [error, setError] = useState(null);
+   
 
 
 
