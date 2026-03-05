@@ -1,70 +1,53 @@
-# Getting Started with Create React App
+DNA Local Alignment Web Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Overview
+This full-stack web application performs local DNA sequence alignment using the Smith-Waterman algorithm and  provides users with the option for NCBI BLAST taxonomic analyses.
 
-## Available Scripts
+This demonstrates:
+    - Algorithm implementation (dynamic programming)
+    - Bioinformatics integration (NCBI Blast)
+    - REST API design (Flask)
+    - A React frotend with animated matrix visualization
+    - Full-stack async communication
 
-In the project directory, you can run:
+Features:
+    - Local sequence alignment (Smith-Waterman)
+    - Interactive scoring matrix visualization
+    - Animated traceback display
+    - Alignment similarity percentage calculation
+    - Optional BLAST integration for taxonomic identification
+    - RNA -> DNA automatic conversion
+    - Input validation and error handling
 
-### `npm start`
+Tech Stack
+Frontend:
+    - React
+    - JavaScript
+    - Async Fetch API
+    - Component-based architecture
+Backend:
+    - Flask
+    - BioPython (NCBI BLAST)
+    - Smith-Waterman custom implementation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Architecture
+User Input -> React UI
+React -> Post
+Flask Backend:
+    - Validate sequences
+    - Run Smith-Waterman
+    - Optionally run BLAST
+    - Return JSON response
+React: 
+    - Render alignment
+    - Animation of traceback
+    - Displays taxonomic result
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Why This Project
+My academic background is in biology, my senior thesis and research experience were heavily focused on viruses. This project bridges bioinformatics and software engineering by combining:
+    - Algorithmic implementation
+    - Backend API design
+    - Frontend Visualization
+    - External data integration
+Essentially, it demonstrates the ability to build complete systems from algorithm(s) to UI.
