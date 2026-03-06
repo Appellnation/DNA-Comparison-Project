@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { compareDna } from './services/api';
+import { compareDna } from './services/apiService';
 
 function App() {
     const [seq1, setSequence1] = useState('');
@@ -9,6 +9,8 @@ function App() {
     const [similarity, setSimilarity] = useState(null);
     const [error, setError] = useState(null);
     const [scoringMatrix, setScoringMatrix] = useState([]);
+    const [alignedSeq1, setAlignedSeq1] = useState("");
+    const [alignedSeq2, setAlignedSeq2] = useState("");
     const [runBlast, setRunBlast] = useState(false);
     const [blastResult, setBlastResult] = useState(null);
     const [blastLoading, setBlastLoading] = useState(false);
@@ -123,6 +125,9 @@ function App() {
                 <>
                     <div>
                         <p>Similarity: {similarity}%</p>
+
+                        <p><strong>Aligned Sequence 1:</strong> {alignedSeq1}</p>
+                        <p><strong>Aligned Sequence 2:</strong> {alignedSeq2}</p>
 
                         <div style={{
                             marginTop: "20px",
