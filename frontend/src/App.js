@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { compareDna } from './services/apiService';
+import { compareDna, runBlast as runBlastQuery } from './services/apiService';
 
 function App() {
     const [seq1, setSequence1] = useState('');
@@ -34,45 +34,46 @@ function App() {
     };
 
 
-    const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!seq1 || !seq2) { alert("Both sequences are required"); return; }
 
-        if (!seq1 || !seq2) {
-        alert("Both sequences are required");
-        return;
-    }
+        setTraceStep(0);
+        setBlastResult(null);
+        setError(null);
+        setLoading(true);
+
         try {
+            // Step 1: Run alignment immediately
+            const result = await compareDna(seq1, seq2);
 
-            setTraceStep(0);
-            setBlastResult(null);
-            setBlastLoading(false);
-            setError(null);
-
-            // Pass seq1 and seq2 correctly to the API
-            setLoading(true);
-            if (runBlast) setBlastLoading(true);
-            const result = await compareDna(seq1, seq2, runBlast);
-
-            if (!Array.isArray(result.scoring_matrix)){
-                throw new Error("There is an invalid scoring matrix");
+            if (!Array.isArray(result.scoring_matrix)) {
+                throw new Error("Invalid scoring matrix");
             }
 
             setSimilarity(result.similarity_score);
-            setScoringMatrix(result.scoring_matrix); // Adjust this if your backend returns a different structure
+            setScoringMatrix(result.scoring_matrix);
             setTraceback(result.traceback);
-            setBlastResult(result.blast);
-            setBlastLoading(false);
             setAlignedSeq1(result.aligned_seq1);
             setAlignedSeq2(result.aligned_seq2);
+            setLoading(false);  // matrix is ready, stop main loader
 
-        } catch (error) {
-            console.error("Error comparing DNA sequences:", error);
-            setError(error.message);
-            setBlastLoading(false);
-        }finally {
+            // Step 2: Fire BLAST in background if requested
+            if (runBlast) {
+                setBlastLoading(true);
+                const cleanSeq = result.aligned_seq1.replace(/-/g, "");
+                runBlastQuery(cleanSeq)
+                    .then(blastData => setBlastResult(blastData))
+                    .catch(err => setBlastResult({ error: err.message }))
+                    .finally(() => setBlastLoading(false));
+            }
+
+        } catch (err) {
+            console.error(err);
+            setError(err.message);
             setLoading(false);
         }
-    };
+};
 
     useEffect(() => {
         if (traceback.length === 0) return;

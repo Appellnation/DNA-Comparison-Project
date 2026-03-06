@@ -58,7 +58,6 @@ def compare():
     if not data:
         return jsonify({"error": "Invalid JSON payload"}), 400
 
-    run_blast = data.get("run_blast", False)
     seq1 = data.get("seq1")
     seq2 = data.get("seq2")
 
@@ -86,17 +85,6 @@ def compare():
         result = smith_waterman(seq1, seq2)
         similarity = calculate_similarity(result["aligned_seq1"], result["aligned_seq2"])
 
-        blast_result = None
-
-        if run_blast:
-            query_sequence = result["aligned_seq1"].replace("-", "")
-
-            if len(query_sequence) >= 20:
-                blast_result = get_taxonomy_from_blast(query_sequence)
-            else:
-                logging.info("Sequence too short for BLAST.")
-                blast_result = None
-
     except Exception as e:
         logging.error(f"Alignment failed: {str(e)}")
         return jsonify({"error": str(e)}), 500
@@ -107,9 +95,24 @@ def compare():
         "traceback": result["traceback"],
         "aligned_seq1": result["aligned_seq1"],
         "aligned_seq2": result["aligned_seq2"],
-        "blast": blast_result
     })
 
+@app.route('/blast', methods=['POST'])
+def blast():
+    data = request.get_json()
+    sequence = data.get("sequence")
+
+    if not sequence:
+        return jsonify({"error": "No sequence provided"}), 400
+
+    if len(sequence) < 20:
+        return jsonify({"error": "Sequence too short for BLAST"}), 400
+
+    result = get_taxonomy_from_blast(sequence)
+    if not result:
+        return jsonify({"error": "No BLAST match found"}), 404
+
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(debug=True)

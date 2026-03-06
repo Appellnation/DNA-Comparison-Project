@@ -1,5 +1,5 @@
 const API_URL = 'http://localhost:5000';
-const REQUEST_TIMEOUT = 15000;
+const REQUEST_TIMEOUT = 300000;
 
 export const compareDna = async (seq1, seq2, runBlast) => {
     const controller = new AbortController();
@@ -47,4 +47,19 @@ export const compareDna = async (seq1, seq2, runBlast) => {
         }
         throw error;
     }
+};
+
+export const runBlast = async (sequence) => {
+    const response = await fetch(`${API_URL}/blast`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sequence }),
+    });
+
+    if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "BLAST failed");
+    }
+
+    return response.json();
 };
