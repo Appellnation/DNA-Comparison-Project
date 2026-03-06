@@ -26,8 +26,7 @@ def get_user_input():
 def confirm_sequences_are_nucleotides(seq1, seq2):
     valid = {'A', 'T', 'G', 'C', 'U'}
     combined = itertools.chain(seq1, seq2)
-    if not all (nucleotide in valid for nucleotide in combined):
-        raise ValueError("Only valid nucleotide sequences are accepted.")
+    return all(nucleotide in valid for nucleotide in combined)
     
 
 # Function to convert potential RNA sequences to DNA for uniform analyzing

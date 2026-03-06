@@ -7,6 +7,7 @@ from Smith_Waterman_Revised import (
     confirm_sequences_are_nucleotides,
     rna_to_dna,
     smith_waterman,
+    calculate_similarity,
 )
 
 app = Flask(__name__)
@@ -68,7 +69,7 @@ def compare():
     seq1 = seq1.strip().upper()
     seq2 = seq2.strip().upper()
 
-    if not confirm_sequences_are_nucleotides([seq1, seq2]):
+    if not confirm_sequences_are_nucleotides(seq1, seq2):
         return jsonify({
             "error": "Please provide valid nucleotide sequences (A, T, C, G, U only)."
         }), 400
@@ -83,6 +84,7 @@ def compare():
     try:
         logging.info("Running Smith-Waterman alignment...")
         result = smith_waterman(seq1, seq2)
+        similarity = calculate_similarity(result["aligned_seq1"], result["aligned_seq2"])
 
         blast_result = None
 
@@ -100,7 +102,7 @@ def compare():
         return jsonify({"error": str(e)}), 500
 
     return jsonify({
-        "similarity_score": result["similarity"],
+        "similarity_score": similarity,
         "scoring_matrix": result["matrix"],
         "traceback": result["traceback"],
         "aligned_seq1": result["aligned_seq1"],
