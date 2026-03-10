@@ -34,11 +34,16 @@ def get_taxonomy_from_blast(query_sequence):
 
         top_alignment = blast_record.alignments[0]
         title = top_alignment.title
+        logging.info(f"Raw BLAST title: {title}") 
 
-        taxonomy = (
-            title.split('[')[-1].replace(']', '')
-            if '[' in title else "Unknown Organism"
-        )
+
+        if '[' in title:
+            taxonomy = title.split('[')[-1].replace(']', '')
+        else:
+            # Extract organism from title text after the last pipe character
+            after_pipe = title.split('|')[-1].strip()
+            # Take only the first 3 words (genus, species, strain identifier)
+            taxonomy = ' '.join(after_pipe.split()[:3])
 
         logging.info(f"Top BLAST match: {taxonomy}")
 

@@ -15,7 +15,7 @@ function App() {
     const [blastResult, setBlastResult] = useState(null);
     const [blastLoading, setBlastLoading] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [animationSpeed, setAnimationSpeed] = useState(300);
+    const [animationSpeed] = useState(50);
    
 
 
@@ -97,31 +97,56 @@ function App() {
                 </div>
             )}
             <form onSubmit={handleSubmit}>
-                <input 
-                    type="text" 
-                    value={seq1} 
-                    onChange={(e) => setSequence1(e.target.value.toUpperCase())} 
-                    placeholder="Enter first sequence" 
-                />
-                <input
-                    type="text" 
-                    value={seq2} 
-                    onChange={(e) => setSequence2(e.target.value.toUpperCase())} 
-                    placeholder="Enter second sequence" 
-                />
-                <label style={{ display: "block", marginTop: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "10px" }}>
+                    <label style={{ fontSize: 13, color: "#aaa" }}>Sequence 1</label>
                     <input
-                        type="checkbox"
-                        checked={runBlast}
-                        onChange={(e) => setRunBlast(e.target.checked)}
+                        type="text"
+                        value={seq1}
+                        onChange={(e) => setSequence1(e.target.value.toUpperCase())}
+                        placeholder="Enter first nucleotide sequence (A, T, C, G, U)"
+                        style={{
+                            width: "100%",
+                            padding: "10px 12px",
+                            fontSize: 14,
+                            fontFamily: "monospace",
+                            backgroundColor: "#0d1825",
+                            color: "#00e5a0",
+                            border: "1px solid #1a3a4a",
+                            borderRadius: 4,
+                            boxSizing: "border-box"
+                        }}
                     />
-                    Run BLAST taxonomic analysis
-                </label>    
-                <button type="submit" disabled={loading}>
-                    {loading? "Comparing ..." : "Compare"}
-                </button>
-            </form>
-
+                    <label style={{ fontSize: 13, color: "#aaa" }}>Sequence 2</label>
+                    <input
+                        type="text"
+                        value={seq2}
+                        onChange={(e) => setSequence2(e.target.value.toUpperCase())}
+                        placeholder="Enter second nucleotide sequence (A, T, C, G, U)"
+                        style={{
+                            width: "100%",
+                            padding: "10px 12px",
+                            fontSize: 14,
+                            fontFamily: "monospace",
+                            backgroundColor: "#0d1825",
+                            color: "#00e5a0",
+                            border: "1px solid #1a3a4a",
+                            borderRadius: 4,
+                            boxSizing: "border-box"
+                        }}
+                           />
+                    </div>
+                    <label style={{ display: "block", marginTop: "10px" }}>
+                        <input
+                            type="checkbox"
+                            checked={runBlast}
+                            onChange={(e) => setRunBlast(e.target.checked)}
+                        />
+                        Run BLAST taxonomic analysis
+                    </label>
+                    <button type="submit" disabled={loading}>
+                        {loading ? "Comparing ..." : "Compare"}
+                    </button>
+                </form>
             {similarity !== null && (
                 <>
                     <div>
