@@ -9,25 +9,25 @@ A full-stack bioinformatics web application that performs local DNA sequence ali
 
 ### 1. Sequence Input Form
 
-![Sequence Input Form](screenshots/DNA_Analysis_Home_Screen.png)
+![Sequence Input Form](screenshots/DNA%20Analysis%20Home%20Screen.png)
 
 ---
 
 ### 2. Scoring Matrix with Traceback Animation
 
-![Scoring Matrix](screenshots/Scoring_Matrix.gif)
+![Scoring Matrix](screenshots/Scoring%20Matrix.gif)
 
 ---
 
 ### 3. Alignment Result & Similarity Score
 
-![Alignment Result](screenshots/Result_Alignment_and_Similarity_Score.gif)
+![Alignment Result](screenshots/Result%20Alignment%20and%20Similarity%20Score.gif)
 
 ---
 
 ### 4. BLAST Taxonomic Result
 
-![BLAST Result](screenshots/BLAST_result.gif)
+![BLAST Result](screenshots/BLAST%20Result.gif)
 
 ---
 
