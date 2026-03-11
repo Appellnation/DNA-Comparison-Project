@@ -1,5 +1,12 @@
 # 🧬 DNA Sequence Alignment & Taxonomy Pipeline
 
+![MIT License](https://img.shields.io/badge/License-MIT-green.svg)
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![React](https://img.shields.io/badge/React-Frontend-61DAFB.svg)
+![Flask](https://img.shields.io/badge/Flask-Backend-black.svg)
+![BioPython](https://img.shields.io/badge/BioPython-BLAST-orange.svg)
+![GitHub last commit](https://img.shields.io/github/last-commit/Appellnation/DNA-Comparison-Project)
+
 A full-stack bioinformatics web application that performs local DNA sequence alignment using the **Smith-Waterman algorithm** and optionally identifies organisms via **NCBI BLAST** taxonomic analysis.
 
 > Built by a biology graduate combining domain expertise with full-stack software engineering — from algorithm implementation to interactive UI.
@@ -11,11 +18,15 @@ A full-stack bioinformatics web application that performs local DNA sequence ali
 
 ![Sequence Input Form](screenshots/DNA%20Analysis%20Home%20Screen.png)
 
+This is the entry point of the application — users paste two nucleotide sequences (DNA or RNA) into the input fields and optionally enable BLAST taxonomic analysis before submitting.
+
 ---
 
 ### 2. Scoring Matrix with Traceback Animation
 
 ![Scoring Matrix](screenshots/Scoring%20Matrix.gif)
+
+The Smith-Waterman scoring matrix is rendered cell by cell after alignment — the yellow traceback path animates automatically, visually tracing the optimal local alignment through the matrix.
 
 ---
 
@@ -23,11 +34,15 @@ A full-stack bioinformatics web application that performs local DNA sequence ali
 
 ![Alignment Result](screenshots/Result%20Alignment%20and%20Similarity%20Score.gif)
 
+The optimal local alignment is displayed in a terminal-style output alongside a percentage similarity score, showing exactly where the two sequences match, mismatch, or contain gaps.
+
 ---
 
 ### 4. BLAST Taxonomic Result
 
 ![BLAST Result](screenshots/BLAST%20Result.gif)
+
+When BLAST is enabled, the aligned sequence is asynchronously submitted to NCBI's nucleotide database and the taxonomic result fills in automatically in the background, displaying the organism name extracted from the top match — note that this may be a partial representation of the full organism classification.
 
 ---
 
@@ -113,11 +128,21 @@ User Input (React UI)
 - pip + npm
 - An active internet conneciton (required for NCBI BLAST queries)
 
+### Recommended — set up a Python virtual environment first
+```bash
+python -m venv env
+env\Scripts\activate
+```
+
 ### Python dependencies
+```bash
 pip install flask flask-cors biopython
+```
 
 ### Node dependencies
+```bash
 npm install
+```
 
 ### Optional but recommended
 - A Python virtual environment to avoid package conflicts:
@@ -126,7 +151,7 @@ npm install
   source env/bin/activate       # Mac/Linux
   env\Scripts\activate          # Windows
   pip install flask flask-cors biopython
-
+```
 ### Backend setup
 
 ```bash
