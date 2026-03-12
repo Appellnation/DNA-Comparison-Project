@@ -183,6 +183,9 @@ DNA-Alignment-Pipeline/
 │   ├── App.js                    # Main React component
 │   └── services/
 │       └── apiService.js         # Fetch API calls with timeout handling
+├── .gitignore                    # Excludes __pycache__, .pyc files
+├── test_dna_pipeline.py          # Pytest test suite
+├──screenshots/
 └── README.md
 ```
 
