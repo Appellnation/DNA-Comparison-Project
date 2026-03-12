@@ -58,7 +58,7 @@ def get_taxonomy_from_blast(query_sequence):
 
 @app.route('/compare', methods=['POST'])
 def compare():
-    data = request.get_json()
+    data = request.get_json(Force = True, silent = True)
 
     if not data:
         return jsonify({"error": "Invalid JSON payload"}), 400

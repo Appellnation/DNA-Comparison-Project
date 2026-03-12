@@ -31,7 +31,7 @@ def confirm_sequences_are_nucleotides(seq1, seq2):
 
 # Function to convert potential RNA sequences to DNA for uniform analyzing
 def rna_to_dna(seq):
-    return seq.replace("U","T")
+    return seq.replace("U","T").replace("u", "t")
 
 #Function to ensure that the sequence is DNA (and convert RNA to DNA if needed)
 def ensure_dna_sequence(sequence):
