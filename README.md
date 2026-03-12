@@ -178,14 +178,21 @@ React runs at `http://localhost:3000`
 DNA-Alignment-Pipeline/
 ├── backend/
 │   ├── app.py                    # Flask API — /compare and /blast routes
+│   ├── __init__.py               # Marks backend as a Python package
+│   └── requirements.txt          # Python dependencies
 │   └── Smith_Waterman_Revised.py # Smith-Waterman algorithm + utilities
-├── src/
-│   ├── App.js                    # Main React component
-│   └── services/
-│       └── apiService.js         # Fetch API calls with timeout handling
+├── frontend/
+│   ├── public/                   # Static assets, root index.html
+│   ├── src/
+│   │   ├── App.js                # Main React component
+│   │   └── services/
+│   │       └── apiService.js     # Fetch API calls with timeout handling
+│   ├── .gitignore                # Excludes node_modules
+│   ├── package.json              # Frontend dependencies
+│   └── package-lock.json         # Locked dependency versions
 ├── .gitignore                    # Excludes __pycache__, .pyc files
 ├── test_dna_pipeline.py          # Pytest test suite
-├──screenshots/
+├── screenshots/                  # Screenshot + GIFs
 └── README.md
 ```
 
