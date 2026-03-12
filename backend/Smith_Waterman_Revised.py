@@ -200,39 +200,6 @@ def calculate_similarity(aligned_seq1, aligned_seq2):
     similarity = (matches / total) * 100
     return similarity
 
-###Sending our sequence to BLAST 
-###Parsing Taxanomy
-def get_taxonomy_from_blast(query_sequence):
-    #perform blast search - blastn is blast nucleotide sequences, nt is nucleotide database
-    
-    try:
-        result_handle = NCBIWWW.qblast(
-            program = "blastn",
-            database ="nt",
-            sequence = query_sequence,
-            hitlist_size = 1
-        )
-
-        blast_record = NCBIXML.parse(result_handle)
-
-        if not blast_record.alingments:
-            return None, None
-        
-        top_alignment = blast_record.alignments[0]
-
-        title = top_alignment.title
-
-        #Extracting Organism Name from Reference Number(s)
-        taxonomy = (
-            title.split('[')[-1].replace(']', '')
-        if '[' in title else "Unknown organism"
-        )
-        
-        return title, taxonomy
-    
-    except Exception:
-        return None, None
-
 def get_top_blast_hits(query_sequence, max_hits = 3):
     """
     Run Blast on query sequence and return top 3 hits

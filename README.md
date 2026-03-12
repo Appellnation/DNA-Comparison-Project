@@ -156,7 +156,7 @@ npm install
 
 ```bash
 cd backend
-pip install flask flask-cors biopython
+pip install -r requirements.txt
 python app.py
 ```
 Flask runs at `http://localhost:5000`
