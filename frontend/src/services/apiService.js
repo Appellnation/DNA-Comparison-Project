@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://dna-comparison-project.onrender.com';
 const REQUEST_TIMEOUT = 300000;
 
 export const compareDna = async (seq1, seq2, runBlast) => {
