@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from Bio.Blast import NCBIWWW, NCBIXML
 import logging
+import threading
+import uuid
 
 from Smith_Waterman_Revised import (
     confirm_sequences_are_nucleotides,
@@ -14,6 +16,7 @@ app = Flask(__name__)
 CORS(app)
 
 logging.basicConfig(level=logging.INFO)
+jobs = {}
 
 def get_taxonomy_from_blast(query_sequence):
     try:
@@ -113,11 +116,34 @@ def blast():
     if len(sequence) < 20:
         return jsonify({"error": "Sequence too short for BLAST"}), 400
 
-    result = get_taxonomy_from_blast(sequence)
-    if not result:
-        return jsonify({"error": "No BLAST match found"}), 404
+    # Create a unique job ID and store it immediately
+    job_id = str(uuid.uuid4())
+    jobs[job_id] = {"status": "pending"}
 
-    return jsonify(result)
+    # Spin up a background thread to run BLAST
+    def run_blast_job():
+        result = get_taxonomy_from_blast(sequence)
+        if result:
+            jobs[job_id] = {"status": "complete", "result": result}
+        else:
+            jobs[job_id] = {"status": "failed", "error": "No BLAST match found"}
+
+    thread = threading.Thread(target=run_blast_job)
+    thread.daemon = True
+    thread.start()
+
+    # Return the job ID immediately — don't wait for BLAST
+    return jsonify({"job_id": job_id}), 202
+
+
+@app.route('/blast/status/<job_id>', methods=['GET'])
+def blast_status(job_id):
+    job = jobs.get(job_id)
+
+    if not job:
+        return jsonify({"error": "Job not found"}), 404
+
+    return jsonify(job)
 
 if __name__ == "__main__":
     app.run(debug=True)

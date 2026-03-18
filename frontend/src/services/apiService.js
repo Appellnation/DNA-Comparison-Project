@@ -49,7 +49,7 @@ export const compareDna = async (seq1, seq2, runBlast) => {
     }
 };
 
-export const runBlast = async (sequence) => {
+export const submitBlastJob = async (sequence) => {
     const response = await fetch(`${API_URL}/blast`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -58,8 +58,19 @@ export const runBlast = async (sequence) => {
 
     if (!response.ok) {
         const err = await response.json();
-        throw new Error(err.error || "BLAST failed");
+        throw new Error(err.error || "BLAST submission failed");
     }
 
-    return response.json();
+    return response.json(); // returns { job_id: "..." }
+};
+
+export const pollBlastStatus = async (jobId) => {
+    const response = await fetch(`${API_URL}/blast/status/${jobId}`);
+
+    if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "Status check failed");
+    }
+
+    return response.json(); // returns { status: "pending"|"complete"|"failed", result?: {...} }
 };

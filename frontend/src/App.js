@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { compareDna, runBlast as runBlastQuery } from './services/apiService';
+import { compareDna, submitBlastJob, pollBlastStatus } from './services/apiService';
+
 
 function App() {
     const [seq1, setSequence1] = useState('');
@@ -60,13 +61,40 @@ function App() {
 
             // Step 2: Fire BLAST in background if requested
             if (runBlast) {
-                setBlastLoading(true);
-                const cleanSeq = result.aligned_seq1.replace(/-/g, "");
-                runBlastQuery(cleanSeq)
-                    .then(blastData => setBlastResult(blastData))
-                    .catch(err => setBlastResult({ error: err.message }))
-                    .finally(() => setBlastLoading(false));
-            }
+    setBlastLoading(true);
+    const cleanSeq = result.aligned_seq1.replace(/-/g, "");
+
+        try {
+            const { job_id } = await submitBlastJob(cleanSeq);
+
+            // Poll every 5 seconds until complete or failed
+            const interval = setInterval(async () => {
+                try {
+                    const statusData = await pollBlastStatus(job_id);
+
+                    if (statusData.status === "complete") {
+                        setBlastResult(statusData.result);
+                        setBlastLoading(false);
+                        clearInterval(interval);
+                    } else if (statusData.status === "failed") {
+                        setBlastResult({ error: statusData.error });
+                        setBlastLoading(false);
+                        clearInterval(interval);
+                    }
+                    // If still "pending", do nothing — interval fires again in 5 seconds
+
+                } catch (err) {
+                    setBlastResult({ error: err.message });
+                    setBlastLoading(false);
+                    clearInterval(interval);
+                }
+            }, 5000);
+
+        } catch (err) {
+            setBlastResult({ error: err.message });
+            setBlastLoading(false);
+        }
+    }
 
         } catch (err) {
             console.error(err);
