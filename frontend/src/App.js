@@ -104,7 +104,7 @@ function App() {
 };
 
     useEffect(() => {
-        fetch('https://dna-comparison-project.onrender.com').catch(() => {});
+        fetch('https://dna-comparison-project.onrender.com/').catch(() => {});
     }, []);
 
     useEffect(() => {
