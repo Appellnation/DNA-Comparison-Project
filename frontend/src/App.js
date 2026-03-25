@@ -104,6 +104,10 @@ function App() {
 };
 
     useEffect(() => {
+        fetch('https://your-render-url.onrender.com/').catch(() => {});
+    }, []);
+
+    useEffect(() => {
         if (traceback.length === 0) return;
 
         const interval = setInterval(() => {
