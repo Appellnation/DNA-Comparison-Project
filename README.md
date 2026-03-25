@@ -11,6 +11,8 @@ A full-stack bioinformatics web application that performs local DNA sequence ali
 
 > Built by a biology graduate combining domain expertise with full-stack software engineering — from algorithm implementation to interactive UI.
 
+## 🌐 Live Demo
+[Click here to try it](https://appellnation-dna-comparison-project.vercel.app/)
 
 ## 📸 Screenshots
 
