@@ -85,9 +85,9 @@ AGAGTTTGATCCTGGCTCAGATTGAACGCTGGCGGCAGGCCTAACACATGCAAGTCGAACGGTAACAGGA
 ## 🏗️ Architecture
 
 ```
-User Input (React UI)
+User Input (React UI — Vercel)
         ↓
-  POST /compare  →  Flask Backend
+  POST /compare  →  Flask Backend (Render)
                         ├── Validate nucleotide sequences
                         ├── Convert RNA → DNA if needed
                         ├── Run Smith-Waterman alignment
@@ -95,12 +95,20 @@ User Input (React UI)
         ↓
   Matrix renders immediately in browser
         ↓
-  POST /blast (async, background)  →  Flask Backend
-                                           ├── Submit to NCBI BLAST
-                                           └── Parse taxonomic result
+  POST /blast  →  Flask Backend (Render)
+                        ├── Spawn background thread
+                        ├── Return job_id immediately (202)
+                        └── Run NCBI BLAST query in background
+        ↓
+  Frontend polls GET /blast/status/<job_id> every 5 seconds
         ↓
   BLAST result fills in when ready
 ```
+
+**Deployment**
+- Frontend hosted on [Vercel](https://vercel.com)
+- Backend hosted on [Render](https://render.com)
+- Long-running BLAST queries handled via a background job system with status polling — prevents request timeouts on free-tier hosting
 
 ---
 
@@ -119,6 +127,11 @@ User Input (React UI)
 **Algorithm**
 - Custom Smith-Waterman local alignment (dynamic programming)
 - Scoring: Match +1, Mismatch -1, Gap -1
+
+**Deployment**
+- Frontend — Vercel
+- Backend — Render (Gunicorn)
+- Background job system with polling for long-running BLAST queries
 
 ---
 
